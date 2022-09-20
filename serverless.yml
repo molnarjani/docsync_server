@@ -1,0 +1,44 @@
+service: datasync
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+
+functions:
+  connect:
+    handler: "src/handlers/connection.handleConnection"
+    events:
+      - websocket:
+          route: $connect
+
+  disconnect:
+    handler: "src/handlers/connection.handleDisconnection"
+    events:
+      - websocket:
+          route: $disconnect
+
+  default:
+    handler: handler.default
+    events:
+      - websocket:
+          route: $default
+
+resources:
+  Resources:
+    usersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: connectionTable
+        AttributeDefinitions:
+          - AttributeName: connectionId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: connectionId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+plugins:
+  - serverless-esbuild
