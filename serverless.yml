@@ -1,25 +1,38 @@
+org: interiorwildebeest
+console: true
 service: datasync
 frameworkVersion: '3'
 
 provider:
   name: aws
   runtime: nodejs16.x
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: 'dynamoDB:*'
+          Resource: '*'
+
 
 functions:
   connect:
     handler: "src/handlers/connection.handleConnection"
+    environment:
+      CONNECTION_TABLE: connectionTable
     events:
       - websocket:
           route: $connect
 
   disconnect:
     handler: "src/handlers/connection.handleDisconnection"
+    environment:
+      CONNECTION_TABLE: connectionTable
     events:
       - websocket:
           route: $disconnect
 
   default:
-    handler: handler.default
+    handler: "src/handlers/message.routingHandler"
     events:
       - websocket:
           route: $default
