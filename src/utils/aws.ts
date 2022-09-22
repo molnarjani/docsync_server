@@ -1,15 +1,16 @@
-import * as mongoDB from "mongodb";
 import { DynamoDB, ApiGatewayManagementApi } from "aws-sdk";
-import { createBrotliCompress } from "zlib";
 const util = require('util')
 
 
-const dynamodbClient = new DynamoDB.DocumentClient();
-const connectionTable: any = process.env.CONNECTION_TABLE;
-const documentsTable: any = process.env.DOCUMENTS_TABLE;
+export const dynamodbClient = new DynamoDB.DocumentClient();
+export const connectionTable: any = process.env.CONNECTION_TABLE;
+export const documentsTable: any = process.env.DOCUMENTS_TABLE;
 
 
-const getApiGWManagementApi = ({ stage, domain }) => {
+export const getApiGWManagementApi = ({ stage, domain }) => {
+    /**
+     * Construct an AWS ApiGW manager class
+     */
     const endpoint = util.format(util.format('https://%s/%s', domain, stage));
     console.log('Endpoint: ', endpoint);
     const apiVersion = '2018-11-29';
@@ -20,7 +21,12 @@ const getApiGWManagementApi = ({ stage, domain }) => {
     return apigatewaymanagementapi;
 };
 
-const sendBroadcastMessage = (payload, apigatewaymanagementapi) => {
+export const sendBroadcastMessage = (payload, apigatewaymanagementapi) => {
+    /**
+     * Queries `connectionTable` for open connections,
+     * then sends message with `payload` for each of them
+     * using the AWS API GW api
+     */
     const params = {
         TableName: connectionTable
     };
@@ -39,7 +45,10 @@ const sendBroadcastMessage = (payload, apigatewaymanagementapi) => {
     })
 };
 
-const sendMessageToClient = (connectionId, payload, apigatewaymanagementapi) => {
+export const sendMessageToClient = (connectionId, payload, apigatewaymanagementapi) => {
+    /**
+     * Sends a message to a single websocket connection
+     */
     console.log('posting to ', connectionId, ' recieved  ', payload);
     return new Promise((resolve, reject) => {
         let postOptions = {
@@ -55,8 +64,3 @@ const sendMessageToClient = (connectionId, payload, apigatewaymanagementapi) => 
         });
     });
 };
-
-
-
-
-export { getApiGWManagementApi, sendMessageToClient, sendBroadcastMessage, dynamodbClient, connectionTable, documentsTable };

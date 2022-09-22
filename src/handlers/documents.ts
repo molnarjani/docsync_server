@@ -2,6 +2,11 @@ import Doc from "../entities/documents"
 import { documentsTable, dynamodbClient }  from "../utils/aws"
 
 export function listDocumentsHandler(cb: Function) {
+    /**
+     * Lists all documents
+     * 
+     * TODO: support pagination
+     */
     const params = {
         TableName: documentsTable
     };
@@ -19,6 +24,9 @@ export function listDocumentsHandler(cb: Function) {
 }
 
 export function getDocumentHandler(documentId: string, cb: Function) {
+    /**
+     * Gets a single document by `documentId`
+     */
     const params = {
         TableName: documentsTable,
         Key: {
@@ -36,6 +44,11 @@ export function getDocumentHandler(documentId: string, cb: Function) {
 }
 
 export async function createDocumentHandler(document: Doc, cb: Function) {
+    /**
+     * Creates a document
+     * Create event is broadcasted so clients can react
+     * https://github.com/molnarjani/docsync_server#broadcast-events
+     */
     const params = {
         TableName: documentsTable,
         Item: {
@@ -48,6 +61,11 @@ export async function createDocumentHandler(document: Doc, cb: Function) {
 }
 
 export async function deleteDocumentHandler(documentId: string, cb: Function) {
+    /**
+     * Deletes a document by `documentId`
+     * Delete event is broadcasted so clients can react
+     * https://github.com/molnarjani/docsync_server#broadcast-events
+     */
     var params = {
         TableName: documentsTable,
         Key: {
@@ -60,6 +78,11 @@ export async function deleteDocumentHandler(documentId: string, cb: Function) {
 }
 
 export async function updateDocumentHandler(document: Doc, cb: Function) {
+    /**
+     * Updated a document if `documentId` exists, otherwise created the document.
+     * Update event is broadcasted so clients can react
+     * https://github.com/molnarjani/docsync_server#broadcast-events
+     */
     const params = {
         TableName: documentsTable,
         Item: {

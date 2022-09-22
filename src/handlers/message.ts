@@ -3,6 +3,15 @@ import { getApiGWManagementApi, sendMessageToClient, sendBroadcastMessage } from
 import { getDocumentHandler, listDocumentsHandler, createDocumentHandler, deleteDocumentHandler, updateDocumentHandler } from "../handlers/documents"
 
 export async function routingHandler (event, context, cb) {
+    /**
+     * Default handler of AWS API GW Websocket API
+     * The handler is used for Document operations 
+     * 
+     * Expects a custom message protocol:
+     * https://github.com/molnarjani/docsync_server#message-protocol
+     * 
+     * Routes messages to document operation handlers that attempt to complete the operations
+     */
     const connectionId = event.requestContext.connectionId
     const domainName = event.requestContext.domainName
     const stage = event.requestContext.stage
