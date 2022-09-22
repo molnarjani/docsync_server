@@ -4,7 +4,8 @@
     "aws-sdk": "^2.1218.0",
     "esbuild": "^0.15.8",
     "moment": "^2.29.4",
-    "serverless-esbuild": "^1.32.8"
+    "serverless-esbuild": "^1.32.8",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "serverless-offline": "^10.1.0"

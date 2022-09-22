@@ -1,24 +1,57 @@
-module.exports.routingHandler = (event, context, cb) => {
-    console.log("DEFAULT: \n" + JSON.stringify(event, null, 2));
+import Doc from "../entities/documents"
+import { getApiGWManagementApi, sendMessageToClient, sendBroadcastMessage } from "../utils/aws";
+import { getDocumentHandler, listDocumentsHandler, createDocumentHandler, deleteDocumentHandler, updateDocumentHandler } from "../handlers/documents"
+
+export async function routingHandler (event, context, cb) {
+    const connectionId = event.requestContext.connectionId
+    const domainName = event.requestContext.domainName
+    const stage = event.requestContext.stage
+    const ApiGW = getApiGWManagementApi({ stage: stage, domain: domainName})
 
     try {
         const body = JSON.parse(event.body)
         const operation = body.operation
         switch (operation) {
             case "GET":
-                console.log("CREATE: \n" + JSON.stringify(body, null, 2));
+                if (body.documentId) {
+                    getDocumentHandler(
+                        body.documentId,
+                        (document: Doc) => sendMessageToClient(connectionId, {'document': document}, ApiGW)
+                    )
+                }
                 break;
             case "LIST":
-                console.log("LIST: \n" + JSON.stringify(body, null, 2));
+                listDocumentsHandler(
+                    (documents: Doc[]) => sendMessageToClient(connectionId, {'documents': documents}, ApiGW)
+                )
                 break;
             case "CREATE":
-                console.log("CREATE: \n" + JSON.stringify(body, null, 2));
+                if (body.document) {
+                    const document = new Doc(body.document.name, body.document.content)
+                    createDocumentHandler(
+                        document,
+                        (document) => sendBroadcastMessage({"operation": "CREATE", 'document': document}, ApiGW)
+                    )
+                }
                 break;
             case "UPDATE":
-                console.log("UPDATE: \n" + JSON.stringify(body, null, 2));
+                if (body.document) {
+                    const document = new Doc(
+                        body.document.name,
+                        body.document.content,
+                        body.document.documentId
+                    )
+                    updateDocumentHandler(
+                        document,
+                        (document) => sendBroadcastMessage({"operation": "UPDATE", 'document': document}, ApiGW)
+                    )
+                }
                 break;
             case "DELETE":
-                console.log("DELETE: \n" + JSON.stringify(body, null, 2));
+                deleteDocumentHandler(
+                    body.documentId,
+                    (documentId) => sendBroadcastMessage({"operation": "DELETE", 'document': documentId}, ApiGW)
+                )
                 break;
 
             default: { 
@@ -36,7 +69,7 @@ module.exports.routingHandler = (event, context, cb) => {
             return
         }
 
-        console.log(`INTERNAL SERVER ERROR: {e.stack}`)
+        console.log(`INTERNAL SERVER ERROR: ${e.stack}`)
         cb(null, {
             statusCode: 500,
             body: e.stack,

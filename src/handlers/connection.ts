@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { dynamodbClient, connectionTable } from '../utils/aws';
 
-module.exports.handleConnection = async (event, context, cb) => {
+export async function handleConnection(event, context, cb) {
   console.log("CONNECT: \n" + JSON.stringify(event, null, 2));
   const connectionId = event.requestContext.connectionId;
 
@@ -20,7 +20,7 @@ module.exports.handleConnection = async (event, context, cb) => {
   });
 };
 
-module.exports.handleDisconnection = async (event, context, cb) => {
+export async function handleDisconnection(event, context, cb) {
   console.log("DISCONNECT: \n" + JSON.stringify(event, null, 2));
   const connectionId = event.requestContext.connectionId;
 

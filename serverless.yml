@@ -13,6 +13,9 @@ provider:
           Action: 'dynamoDB:*'
           Resource: '*'
 
+        - Effect: Allow
+          Action: 'documentDB:*'
+          Resource: '*'
 
 functions:
   connect:
@@ -33,6 +36,9 @@ functions:
 
   default:
     handler: "src/handlers/message.routingHandler"
+    environment:
+      CONNECTION_TABLE: connectionTable
+      DOCUMENTS_TABLE: docsTable
     events:
       - websocket:
           route: $default
@@ -48,6 +54,22 @@ resources:
             AttributeType: S
         KeySchema:
           - AttributeName: connectionId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+    docsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: docsTable
+        AttributeDefinitions:
+          - 
+            AttributeName: documentId
+            AttributeType: S
+        KeySchema:
+          - 
+            AttributeName: documentId
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
