@@ -195,7 +195,7 @@ Server response <-
 
 
 ## Broadcast events
-Upon write operations, broatcast message is emmited to all clients, so the clients can act upon the messages and update their state.
+Upon write operations, broatcast message is emitted to all clients, so the clients can act upon the messages and update their state.
 
 <details>
   <summary>Document creation</summary>
