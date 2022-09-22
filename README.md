@@ -26,6 +26,30 @@ Currently 2 DynamoDB tables are provisioned by `serverless`.
 - `connectionTable`: Stores the connection IDs used for messaging the clients connected over WebSockets
 - `docsTable`: Stores document data
 
+
+## Setup
+### Serverless setup
+1. Install `sls` tool:  
+`brew install serverless`
+2. clone repo  
+`git clone <repo_url>` 
+3. deploy to aws  
+`sls deploy`
+
+### Local development
+1. Install dependencies  
+`yarn install`
+2. Invoke functions
+```
+ CONNECTION_TABLE=connectionTable DOCUMENTS_TABLE=docsTable sls invoke local --function default --data '{ "requestContext": { "routeKey": "$default", "messageId": "Yz5MEf7dIAMCJfw=", "eventType": "MESSAGE", "extendedRequestId": "Yz5MEE6QoAMFusQ=", "requestTime": "21/Sep/2022:12:50:59 +0000", "messageDirection": "IN", "stage": "dev", "connectedAt": 1663764639475, "requestTimeEpoch": 1663764659493, "identity": { "sourceIp": "94.21.159.157" }, "requestId": "Yz5MEE6QoAMFusQ=", "domainName": "i5lj1y1eui.execute-api.us-east-1.amazonaws.com", "connectionId": "Yz5I8fWGIAMCJfw=", "apiId": "i5lj1y1eui" }, "body": "{\"operation\": \"LIST\"}", "isBase64Encoded": false }'
+```
+
+
+
+(To initialize blank project)  
+`sls create --template aws-nodejs-typescript --path` 
+
+
 ## Data Models
 ```
 Document:
